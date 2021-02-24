@@ -3,8 +3,10 @@ package mobileappwebservicesrestassuredtest;
 import com.google.common.collect.HashBiMap;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.MethodSorters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UsersWebserviceEndpointTest {
 
     private final String CONTEXT_PATH = "/mobile-app-ws";
@@ -24,8 +27,9 @@ public class UsersWebserviceEndpointTest {
         RestAssured.port = 8080;
     }
 
+    //testUserLogin
     @Test
-    final void testUserLogin() {
+    final void a() {
 
         Map<String, String> loginDetails = new HashMap<>();
         loginDetails.put("email", EMAIL_ADDRESS);
@@ -47,4 +51,6 @@ public class UsersWebserviceEndpointTest {
         assertNotNull(authorisationHeader);
         assertNotNull(userId);
     }
+
+
 }
