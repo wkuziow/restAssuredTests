@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UsersWebserviceEndpointTest {
@@ -20,6 +21,8 @@ public class UsersWebserviceEndpointTest {
     private final String CONTEXT_PATH = "/mobile-app-ws";
     private final String EMAIL_ADDRESS = "sergey.kargopolov@swiftdeveloperblo.com";
     private final String JSON = "application/json";
+    private static String authorisationHeader;
+    private static String userId;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -45,11 +48,44 @@ public class UsersWebserviceEndpointTest {
                 .extract()
                 .response();
 
-        String authorisationHeader = response.header("Authorization");
-        String userId = response.header("UserID");
+        authorisationHeader = response.header("Authorization");
+        userId = response.header("UserID");
 
         assertNotNull(authorisationHeader);
         assertNotNull(userId);
+    }
+
+    //testGetUserDetails
+    @Test
+    final void b() {
+        Response response = given()
+                .pathParam("id", userId)
+                .header("Authorization", authorisationHeader)
+                .accept(JSON)
+                .when()
+                .get(CONTEXT_PATH + "/users/{id}")
+                .then()
+                .statusCode(200)
+                .contentType(JSON)
+                .extract()
+                .response();
+
+        String userPublicId = response.jsonPath().getString("userId");
+        String userEmail = response.jsonPath().getString("email");
+        String firstName = response.jsonPath().getString("firstName");
+        String lastName = response.jsonPath().getString("lastName");
+        List<Map<String, String>> addresses = response.jsonPath().getList("addresses");
+        String addressId = addresses.get(0).get("addressId");
+
+        assertNotNull(userPublicId);
+        assertNotNull(userEmail);
+        assertNotNull(firstName);
+        assertNotNull(lastName);
+        assertEquals(EMAIL_ADDRESS, userEmail);
+        assertTrue(addresses.size() == 2);
+        assertTrue(addressId.length() == 30);
+
+
     }
 
 
