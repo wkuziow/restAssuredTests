@@ -3,6 +3,7 @@ package mobileappwebservicesrestassuredtest;
 import com.google.common.collect.HashBiMap;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.apache.catalina.User;
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,8 +86,57 @@ public class UsersWebserviceEndpointTest {
         assertTrue(addresses.size() == 2);
         assertTrue(addressId.length() == 30);
 
-
     }
 
+    //test update user Details
+    @Test
+    final void c() {
+        Map<String, Object> userDetails = new HashMap<>();
+        userDetails.put("firstName", "Serge");
+        userDetails.put("lastName", "KG");
 
+        Response response = given()
+                .contentType(JSON)
+                .accept(JSON)
+                .header("Authorization", authorisationHeader)
+                .pathParam("id", userId)
+                .body(userDetails)
+                .when()
+                .put(CONTEXT_PATH + "/users/{id}")
+                .then()
+                .statusCode(200)
+                .contentType(JSON)
+                .extract()
+                .response();
+
+        String firstName = response.jsonPath().getString("firstName");
+        String lastName = response.jsonPath().getString("lastName");
+        List<Map<String, String>> storedAddresses = response.jsonPath().getList("addresses");
+
+        assertEquals("Serge", firstName);
+        assertEquals("KG", lastName);
+        assertNotNull(storedAddresses);
+        assertTrue(storedAddresses.size() == 2);
+    }
+
+    //test delete user details
+    @Test
+    final void d() {
+
+        Response response = given()
+                .header("Authorization", authorisationHeader)
+                .accept(JSON)
+                .pathParam("id", userId)
+                .when()
+                .delete(CONTEXT_PATH + "/users/{id}")
+                .then()
+                .statusCode(200)
+                .contentType(JSON)
+                .extract()
+                .response();
+
+        String operationResult = response.jsonPath().getString("operationResult");
+        assertEquals("SUCCESS", operationResult);
+
+    }
 }
